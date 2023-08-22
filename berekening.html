@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Boiler Energie Berekening</title>
+</head>
+
+<body>
+    <h2>Boiler Energie Berekening</h2>
+    <h3>Een , gebruiken bij het invullen, dus bv 19,4</h3>
+
+    <label for="volume">Boiler Volume (in liters):</label>
+    <input type="text" id="volume" placeholder="Bijv. 100">
+    <br><br>
+
+    <label for="currentSetpoint">Huidige Setpoint (°C):</label>
+    <input type="text" id="currentSetpoint" placeholder="Bijv. 60">
+    <br><br>
+
+    <label for="pvSetpoint">PV Setpoint (°C):</label>
+    <input type="text" id="pvSetpoint" placeholder="Bijv. 85">
+    <br><br>
+
+    <label for="standbyLoss">Stilstandverlies (in watt):</label>
+    <input type="text" id="standbyLoss" placeholder="Bijv. 50">
+    <br><br>
+
+    <label for="boilerPower">Boilervermogen (in kW):</label>
+    <input type="text" id="boilerPower" placeholder="Bijv. 2,5">
+    <br><br>
+
+    <button onclick="calculateEnergy()">Bereken Energie en Tijd</button>
+    <br><br>
+
+    <label for="result">Benodigde Energie (kWh):</label>
+    <input type="text" id="result" readonly>
+    <br><br>
+
+    <label for="time">Benodigde Tijd (HH:MM):</label>
+    <input type="text" id="time" readonly>
+    <br><br>
+
+    <script>
+        function replaceCommaWithDot(value) {
+            return value.replace(',', '.');
+        }
+
+        function formatTime(hours) {
+            const h = Math.floor(hours);
+            const m = Math.round((hours - h) * 60);
+            return h.toString().padStart(2, '0') + ':' + m.toString().padStart(2, '0');
+        }
+
+        function calculateEnergy() {
+            const volume = parseFloat(replaceCommaWithDot(document.getElementById("volume").value));
+            const currentSetpoint = parseFloat(replaceCommaWithDot(document.getElementById("currentSetpoint").value));
+            const pvSetpoint = parseFloat(replaceCommaWithDot(document.getElementById("pvSetpoint").value));
+            const standbyLoss = parseFloat(replaceCommaWithDot(document.getElementById("standbyLoss").value));
+            const boilerPower = parseFloat(replaceCommaWithDot(document.getElementById("boilerPower").value)) * 1000; 
+
+            const specificHeatWater = 4.186 * 1000;
+            const deltaT = pvSetpoint - currentSetpoint;
+            const energyJoules = volume * specificHeatWater * deltaT;
+
+            const energyKWh = energyJoules / (3.6 * Math.pow(10, 6));
+            document.getElementById("result").value = energyKWh.toFixed(2).replace('.', ',');
+
+            const timeHours = energyJoules / (boilerPower - standbyLoss) / 3600;
+            document.getElementById("time").value = formatTime(timeHours);
+        }
+    </script>
+
+</body>
+
+</html>
